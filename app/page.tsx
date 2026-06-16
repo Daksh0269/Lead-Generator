@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import LeadsTable from "@/components/LeadsTable";
 import { Button } from "@/components/ui/button";
 import { Loader2, Search } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Dashboard() {
   const [leads, setLeads] = useState<any[]>([]);
@@ -33,9 +34,23 @@ export default function Dashboard() {
 
   const triggerMiningPipeline = async () => {
     setMining(true);
-    await fetch("/api/fetch-signals", { method: "POST" });
-    await fetchLeads(); // Refresh table after mining
-    setMining(false);
+    toast.loading("Mining web signals & scoring intent...", { id: "mining-toast" }); // Show loading toast
+    
+    try {
+      const response = await fetch("/api/fetch-signals", { method: "POST" });
+      const data = await response.json();
+      
+      if (data.success) {
+        toast.success(`Successfully extracted ${data.count} high-intent leads!`, { id: "mining-toast" });
+        await fetchLeads(); // Refresh table
+      } else {
+        toast.error("Pipeline failed to run.", { id: "mining-toast" });
+      }
+    } catch (error) {
+      toast.error("Network error occurred.", { id: "mining-toast" });
+    } finally {
+      setMining(false);
+    }
   };
 
   return (
