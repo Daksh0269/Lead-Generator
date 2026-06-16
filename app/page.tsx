@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Search } from "lucide-react";
 
 export default function Dashboard() {
-  const [leads, setLeads] = useState([]);
+  const [leads, setLeads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [mining, setMining] = useState(false);
 
